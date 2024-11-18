@@ -1,11 +1,14 @@
 package com.ruufilms.config;
 
+import io.github.cdimascio.dotenv.Dotenv;
+
 import java.sql.*;
 
 public class DatabaseConfig {
-    private static final String URL = "jdbc:mysql://localhost:3306/ruu_film";
-    private static final String USER = "test";
-    private static final String PASSWORD = "Danu2003@";
+    static Dotenv dotenv = Dotenv.load();
+    public static String URL = dotenv.get("DB_HOST");
+    public static String USER = dotenv.get("DB_USER");
+    public static String PASSWORD = dotenv.get("DB_PASSWORD");
     private static Connection connection = null;
 
     public static Connection getConnection () throws SQLException {
