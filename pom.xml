@@ -41,5 +41,11 @@
             <systemPath>${project.basedir}/lib/jlibtorrent-1.2.19.0.jar</systemPath>
         </dependency>
 
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>2.3.0</version>
+        </dependency>
+
     </dependencies>
 </project>
