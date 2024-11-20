@@ -17,6 +17,7 @@ public class Migration {
                     .locations("classpath:db/migration")
                     .load();
 
+            flyway.validate();  // Validate migrations before running
             flyway.migrate();
             System.out.println("Migration completed successfully.");
         } catch (FlywayException e) {
@@ -24,5 +25,9 @@ public class Migration {
         } catch (Exception e) {
             System.err.println("Unexpected error: " + e.getMessage());
         }
+    }
+
+    public static void main(String[] args) {
+        new Migration();
     }
 }

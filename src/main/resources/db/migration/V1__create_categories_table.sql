@@ -1,13 +1,13 @@
 -- V1__Initial_migration.sql
 
 -- Create categories table
-CREATE TABLE categories (
+CREATE TABLE TABLE IF NOT EXISTS categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL
 );
 
 -- Create users table
-CREATE TABLE users (
+CREATE TABLE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(255) NOT NULL UNIQUE,
     name VARCHAR(255),
@@ -16,7 +16,7 @@ CREATE TABLE users (
 );
 
 -- Create films table with a foreign key reference to categories
-CREATE TABLE films (
+CREATE TABLE IF NOT EXISTS films (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     file_id VARCHAR(255),
@@ -26,7 +26,7 @@ CREATE TABLE films (
 );
 
 -- Create flyway_schema_history table (if necessary)
-CREATE TABLE flyway_schema_history (
+CREATE TABLE TABLE IF NOT EXISTS flyway_schema_history (
     installed_rank INT NOT NULL,
     version VARCHAR(50) NOT NULL,
     description VARCHAR(200),
