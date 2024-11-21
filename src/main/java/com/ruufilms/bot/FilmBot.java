@@ -1,6 +1,6 @@
 package com.ruufilms.bot;
 
-import com.ruufilms.handler.MessageHandler;
+import com.ruufilms.config.AppConfig;
 import com.ruufilms.services.FileHandle;
 import com.ruufilms.services.TorrentService;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -10,7 +10,6 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Document;
 import org.telegram.telegrambots.meta.api.objects.File;
 import org.telegram.telegrambots.meta.api.objects.InputFile;
@@ -22,33 +21,28 @@ import java.util.concurrent.Executors;
 
 public class FilmBot extends TelegramLongPollingBot {
     private static final Logger logger = LoggerFactory.getLogger(FilmBot.class);
+    static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
     Dotenv dotenv = Dotenv.load();
     String botToken;
     public FilmBot(DefaultBotOptions option,String botToken){
         super(option, botToken);
         this.botToken =botToken;
+
+        assert config.isDebugEnabled() : "Start Bot Success Fully";
     }
     @Override
     public String getBotUsername() {
         return "Ruu-Films";
     }
 
-
     @Override
     public void onUpdateReceived(Update update) {
+        assert config.isDebugEnabled() : "Update Message Incoming";
         logger.info("Received an update : {}",update);
         System.out.println(update);
-        Object sendMessage = new MessageHandler("I Love You Manika ❤\uFE0F❤\uFE0F❤\uFE0F",update.getMessage().getChatId().toString(), Dotenv.load().get("OWNER_TELEGRAM_CONTACT_SIGNATURE")).ReplyMessage();
-
-        try{
-            execute((SendMessage) sendMessage);
-            logger.info("Reply message sent successfully.");
-        } catch (TelegramApiException e) {
-            logger.error("Failed to send reply message", e);
-        }
         if(update.getMessage().hasDocument()) {
             logger.info("Document received in update.");
-            FileHandle fileHandle = null;
+            FileHandle fileHandle;
             try {
                 Document doc = update.getMessage().getDocument();
                 GetFile getFile = new GetFile();

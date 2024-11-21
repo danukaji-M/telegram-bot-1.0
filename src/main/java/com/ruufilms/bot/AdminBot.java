@@ -4,11 +4,9 @@ import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.objects.Update;
 
-public class TvSeriesBot extends TelegramLongPollingBot {
-    private String botToken;
-    public TvSeriesBot(DefaultBotOptions option, String botToken){
-        super(option,botToken);
-        this.botToken = botToken;
+public class AdminBot extends TelegramLongPollingBot {
+    public AdminBot(String botToken){
+        super(botToken);
     }
     @Override
     public void onUpdateReceived(Update update) {
@@ -17,6 +15,6 @@ public class TvSeriesBot extends TelegramLongPollingBot {
 
     @Override
     public String getBotUsername() {
-        return "Ruu-Tv-Series Upload Bot";
+        return "Admin Bot";
     }
 }

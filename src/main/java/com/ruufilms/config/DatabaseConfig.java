@@ -5,12 +5,11 @@ import io.github.cdimascio.dotenv.Dotenv;
 import java.sql.*;
 
 public class DatabaseConfig {
-    static Dotenv dotenv = Dotenv.load();
-    public static String URL = dotenv.get("DB_HOST");
-    public static String USER = dotenv.get("DB_USER");
-    public static String PASSWORD = dotenv.get("DB_PASSWORD");
+    static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
+    public static String URL = config.getDbHost();
+    public static String USER = config.getDbUser();
+    public static String PASSWORD = config.getDbPassword();
     private static Connection connection = null;
-
     public static Connection getConnection () throws SQLException {
         if(connection == null || connection.isClosed()){
             connection = DriverManager.getConnection(URL,USER,PASSWORD);

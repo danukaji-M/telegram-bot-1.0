@@ -1,4 +1,4 @@
-package com.ruufilms.bot;
+package com.ruufilms.handler;
 
 public class CommandHandler {
 }
