@@ -8,10 +8,7 @@ import com.frostwire.jlibtorrent.alerts.AddTorrentAlert;
 import com.frostwire.jlibtorrent.alerts.Alert;
 import com.frostwire.jlibtorrent.alerts.AlertType;
 import com.frostwire.jlibtorrent.alerts.BlockFinishedAlert;
-import com.ruufilms.bot.FilmBot;
-
 import java.io.File;
-import java.sql.SQLOutput;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -38,8 +35,8 @@ public final class TorrentService {
                         break;
                     case BLOCK_FINISHED:
                         BlockFinishedAlert a = (BlockFinishedAlert) alert;
-                        int p = (int) (a.handle().status().progress() * 100);
-                        System.out.println("Progress "+p+"for torrent name: "+ a.torrentName());
+                        int p = (int) ( a.handle().status().progress() * 100 );
+                        System.out.println("Progress "+ p +"for torrent name: "+ a.torrentName() );
                         System.out.println(s.stats().totalDownload());
                         break;
                     case TORRENT_FINISHED:

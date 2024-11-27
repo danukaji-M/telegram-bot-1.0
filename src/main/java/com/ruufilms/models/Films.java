@@ -1,4 +1,4 @@
 package com.ruufilms.models;
 
-public class TvSeries {
+public class Films {
 }

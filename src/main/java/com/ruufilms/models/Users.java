@@ -1,5 +1,4 @@
 package com.ruufilms.models;
 
-public class FilePart {
-
+public class Users {
 }

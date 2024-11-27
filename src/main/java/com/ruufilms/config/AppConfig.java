@@ -101,6 +101,20 @@ public enum AppConfig {
         properties.put("UNIVERSAL_PATH", env.get("UNIVERSAL_PATH"));
         properties.put("ENABLE_ZIP_FEATURE",env.get("ENABLE_ZIP_FEATURE"));
         properties.put("ZIP_PASSWORD",env.get("ZIP_PASSWORD"));
+        properties.put("ACCOUNT_ADMINISTRAION_BOT_API",env.get("ACCOUNT_ADMINISTRAION_BOT_API"));
+        properties.put("ACCOUNT_AUTO_REPLY",env.get("ACCOUNT_AUTO_REPLY"));
+        properties.put("AACCOUNT_CREATE_GROUP",env.get("ACCOUNT_CREATE_GROUP"));
+        properties.put("ACCOUNT_CREATE_CHANNEL",env.get("ACCOUNT_CREATE_CHANNEL"));
+        properties.put("ACCOUNT_CONTROL_OVER_ADMINS",env.get("ACCOUNT_CONTROL_OVER_ADMINS"));
+        properties.put("ENV_EDIT_ADMIN",env.get("ENV_EDIT_ADMIN"));
+        properties.put("ENV_EDIT_SUPER_ADMIN",env.get("ENV_EDIT_SUPER_ADMIN"));
+        properties.put("TELEGRAM_PAYMENT",env.get("TELEGRAM_PAYMENT"));
+        properties.put("CRYPTO_PAYMENT",env.get("CRYPTO_PAYMENT"));
+        properties.put("ACCOUNT_NUMBER",env.get("ACCOUNT_NUMBER"));
+        properties.put("TWO_STEP_PASSWORD",env.get("TWO_STEP_PASSWORD"));
+        properties.put("APP_ID",env.get("APP_ID"));
+        properties.put("API_HASH",env.get("API_HASH"));
+        properties.put("FLASK_URL",env.get("FLASK_URL"));
 
         log.info("Configuration properties loaded successfully.");
     }
@@ -125,6 +139,9 @@ public enum AppConfig {
             return Boolean.parseBoolean(properties.getProperty(key));
         }
 
+        public String getFlaskUrl(){
+            return get("FLASK_URL");
+        }
         public String getFilmBotApiKey() {
             return get("FILM_BOT_API_KEY");
         }
@@ -412,6 +429,58 @@ public enum AppConfig {
 
         public String getUniversalPath() {
             return get("UNIVERSAL_PATH");
+        }
+        // Add getter methods for all configuration properties
+        public String getAccountAdminBotApiKey() {
+            return get("ACCOUNT_ADMINISTRAION_BOT_API");
+        }
+
+        public boolean isAutoReplyEnabledAccount() {
+            return getBoolean("ACCOUNT_AUTO_REPLY");
+        }
+
+        public boolean isCreateGroupEnabled() {
+            return getBoolean("ACCOUNT_CREATE_GROUP");
+        }
+
+        public boolean isCreateChannelEnabled() {
+            return getBoolean("ACCOUNT_CREATE_CHANNEL");
+        }
+
+        public boolean isControlOverAdminsEnabled() {
+            return getBoolean("ACCOUNT_CONTROL_OVER_ADMINS");
+        }
+
+        public boolean isEnvEditAdminEnabled() {
+            return getBoolean("ENV_EDIT_ADMIN");
+        }
+
+        public boolean isEnvEditSuperAdminEnabled() {
+            return getBoolean("ENV_EDIT_SUPER_ADMIN");
+        }
+
+        public boolean isTelegramPaymentEnabled() {
+            return getBoolean("TELEGRAM_PAYMENT");
+        }
+
+        public boolean isCryptoPaymentEnabled() {
+            return getBoolean("CRYPTO_PAYMENT");
+        }
+
+        public String getAccountNumber() {
+            return get("ACCOUNT_NUMBER");
+        }
+
+        public String getTwoStepPassword() {
+            return get("TWO_STEP_PASSWORD");
+        }
+
+        public String getAppId() {
+            return get("APP_ID");
+        }
+
+        public String getApiHash() {
+            return get("API_HASH");
         }
     }
 }

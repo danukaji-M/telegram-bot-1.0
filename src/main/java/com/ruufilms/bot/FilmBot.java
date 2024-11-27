@@ -3,9 +3,7 @@ package com.ruufilms.bot;
 import com.ruufilms.config.AppConfig;
 import com.ruufilms.services.FileHandle;
 import com.ruufilms.services.TorrentService;
-import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
@@ -18,18 +16,40 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class FilmBot extends TelegramLongPollingBot {
-    private static final Logger logger = LoggerFactory.getLogger(FilmBot.class);
-    static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
-    Dotenv dotenv = Dotenv.load();
-    String botToken;
-    public FilmBot(DefaultBotOptions option,String botToken){
-        super(option, botToken);
-        this.botToken =botToken;
 
-        assert config.isDebugEnabled() : "Start Bot Success Fully";
+    private Logger logger;
+    private static FilmBot instance;
+
+    static AppConfig.Config config;
+    String botToken;
+
+    private FilmBot(DefaultBotOptions option) {
+        super(option);
     }
+
+    // Static method for getting the single instance
+    public static FilmBot getInstance(DefaultBotOptions options) {
+        if (instance == null) {
+            synchronized (FilmBot.class) {
+                if (instance == null) {
+                    instance = new FilmBot(options);
+                }
+            }
+        }
+        return instance;
+    }
+
+    // Initialization method
+    public void initialize(String botToken, AppConfig.Config config, Logger logger) {
+        this.botToken = botToken;
+        this.config = config;
+        this.logger = logger;
+        assert config.isDebugEnabled() : "Bot successfully initialized";
+    }
+
     @Override
     public String getBotUsername() {
         return "Ruu-Films";
@@ -50,16 +70,16 @@ public class FilmBot extends TelegramLongPollingBot {
 
                 File file = execute(getFile);
                 String filePath = file.getFilePath();
-                String torFilePath = dotenv.get("TELEGRAM_LOCAL_SERVER_INSTALLATION_PATH") + dotenv.get("UNIVERSAL_PATH") + this.botToken + "/" + filePath;
+                String torFilePath = config.getTelegramLocalServerInstallationPath() + config.getUniversalPath() + this.botToken + "/" + filePath;
 
                 logger.info("Document file path: {}", torFilePath);
 
                 fileHandle = new FileHandle();
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 FileHandle finalFileHandle = fileHandle;
-
+                final Object lock = new Object();
                 executor.submit(() -> {
-                    synchronized (this){
+                    synchronized (lock) {
                         try {
                             logger.info("Starting TorrentService with file: {}", torFilePath);
                             new TorrentService(torFilePath, String.valueOf(finalFileHandle.getFilmDownloadFolder()));
@@ -71,6 +91,10 @@ public class FilmBot extends TelegramLongPollingBot {
                 });
 
                 executor.shutdown();
+                if (!executor.awaitTermination(60, TimeUnit.SECONDS)) {
+                    logger.warn("Executor did not terminate in the expected time. Forcing shutdown...");
+                    executor.shutdownNow();
+                }
 
                 FileHandle newUpFiles = new FileHandle();
                 newUpFiles.DeleteFiles(new java.io.File(torFilePath));

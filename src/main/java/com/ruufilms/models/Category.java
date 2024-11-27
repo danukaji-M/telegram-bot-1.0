@@ -1,4 +1,4 @@
 package com.ruufilms.models;
 
-public class CachedFilm {
+public class Category {
 }
