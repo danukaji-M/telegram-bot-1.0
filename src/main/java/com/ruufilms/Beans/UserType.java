@@ -1,4 +1,4 @@
-package com.ruufilms.models;
+package com.ruufilms.Beans;
 
 public class UserType {
     private int typeId;

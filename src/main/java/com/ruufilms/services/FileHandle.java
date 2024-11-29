@@ -1,5 +1,11 @@
 package com.ruufilms.services;
 
+
+
+import com.ruufilms.bot.UploadBot;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -7,11 +13,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
 
 public class FileHandle {
 
     List<String> filePaths = new ArrayList<>();
+    private Logger logger = LoggerFactory.getLogger(UploadBot.class);
     private final String userHome = System.getProperty("user.home");
     private final Path downloadsPath = Paths.get(userHome,"Downloads");
     private final Path filmDownloadFolder = Paths.get(String.valueOf(downloadsPath),"Ruu_Bot","Films");
@@ -28,17 +37,11 @@ public class FileHandle {
             "HDMOV", "AVCHD", "MLV", "EVO", "MXF", "FIC", "PS", "TS", "OGG",
             "VRO", "DVCPRO", "DVCAM","PDF","MP3","EPUB","TXT"
     };
-    public FileHandle(){
-        File folder = new File(String.valueOf(getFilmDownloadFolder()));
-        fileSearch(folder);
+    public FileHandle(String userId){
+        this.user_id =userId;
     }
-
-    public String getUser_id() {
-        return user_id;
-    }
-
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    private String getUserID(){
+        return this.user_id;
     }
     /**
      * Creates a unique download folder for a user based on their user_id.
@@ -46,7 +49,7 @@ public class FileHandle {
      * @return The path of the created folder as a String.
      */
     public void createDownloadFolder() {
-        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUser_id()); // Append user_id to the base folder path
+        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUserID()); // Append user_id to the base folder path
 
         try {
             if (Files.notExists(userFolder)) {
@@ -56,7 +59,7 @@ public class FileHandle {
                 System.out.println("Folder already exists for user: " + userFolder);
             }
         } catch (IOException e) {
-            System.err.println("Error creating folder for user " + getUser_id() + ": " + e.getMessage());
+            System.err.println("Error creating folder for user " + getUserID() + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -101,10 +104,28 @@ public class FileHandle {
         return filePaths;
     }
 
-    public List<String> getUploadFilePath(){
-        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUser_id());
-        return fileSearch(new File(userFolder.toString()));
+    public List<String> getUploadFilePath() {
+        // Log the current state of filmDownloadFolder and User ID
+        System.out.println("Film Download Folder: " + filmDownloadFolder);
+        System.out.println("User ID: " + getUserID());
+
+        if (filmDownloadFolder == null || getUserID() == null || getUserID().isEmpty()) {
+            logger.error("Film download folder or User ID is null or empty.");
+            return Collections.emptyList();  // Return empty list if the folder or user ID is invalid
+        }
+
+        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUserID());
+
+        // Check if the user folder exists and is a directory
+        if (!userFolder.toFile().exists() || !userFolder.toFile().isDirectory()) {
+            logger.error("User folder does not exist or is not a directory: {}", userFolder);
+            return Collections.emptyList();  // Return empty list if the folder does not exist or is not a directory
+        }
+
+        return fileSearch(userFolder.toFile());
     }
+
+
 
     private boolean matchesFormat(String fileName) {
         int dotIndex = fileName.lastIndexOf(".");
@@ -119,9 +140,20 @@ public class FileHandle {
 
 
     public File getFilmDownloadFolder() {
-        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUser_id());
+        if (filmDownloadFolder == null) {
+            logger.error("Film download folder is null.");
+            return null; // Or handle the case appropriately
+        }
+        String userId = getUserID();
+        if (userId == null || userId.isEmpty()) {
+            logger.error("User ID is null or empty.");
+            return null; // Or handle the case appropriately
+        }
+
+        Path userFolder = Paths.get(filmDownloadFolder.toString(), userId);
         return new File(String.valueOf(userFolder));
     }
+
 
     public void deleteFolder() {
         File downloadFolder = new File(String.valueOf(getFilmDownloadFolder()));
@@ -173,4 +205,7 @@ public class FileHandle {
         }
     }
 
+    public static void main(String[] args) {
+
+    }
 }

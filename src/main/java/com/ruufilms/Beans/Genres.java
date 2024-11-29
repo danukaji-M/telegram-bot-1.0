@@ -1,4 +1,4 @@
-package com.ruufilms.models;
+package com.ruufilms.Beans;
 
 import com.ruufilms.config.DatabaseConfig;
 
@@ -33,6 +33,7 @@ public class Genres {
             }else{
                 System.out.println("Something went wrong");
             }
+            DatabaseConfig.closeConnection();
         }catch (SQLException e){
             e.printStackTrace();
         }
@@ -47,6 +48,8 @@ public class Genres {
             }else{
                 System.out.println("Something went wrong");
             }
+            DatabaseConfig.closeConnection();
+
         }catch (SQLException e){
             e.printStackTrace();
         }

@@ -9,11 +9,11 @@ import com.ruufilms.bot.UploadBot;
 import com.ruufilms.bot.TvSeriesBot;
 import com.ruufilms.config.AppConfig;
 import com.ruufilms.migration.Migration;
-import com.ruufilms.services.FileHandle;
+import com.ruufilms.Beans.User;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
@@ -22,8 +22,9 @@ import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
 public class Main {
     static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
+    User user = new User();
     public static void main(String[] args) {
-        final Logger logger = LoggerFactory.getLogger(UploadBot.class);
+        final Logger logger = LogManager.getLogger(UploadBot.class);
         try{
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             //initialized env reader
@@ -39,7 +40,7 @@ public class Main {
             Thread thread4 = getThread4(config, botsApi,logger);
 
             //Thread Start Area
-            thread.start();
+//            thread.start();
             thread1.start();
             thread2.start();
             thread3.start();
@@ -55,8 +56,7 @@ public class Main {
         Runnable fBotThread = ()->{
             DefaultBotOptions option = new DefaultBotOptions();
             option.setBaseUrl(config.getTelegramLocalServerHost());
-            UploadBot bot = UploadBot.getInstance(option);
-            bot.initialize(config.getFilmBotApiKey(),config,logger);
+            UploadBot bot = new UploadBot(option,config.getFilmBotApiKey(),logger);
             try {
                 botsApi.registerBot(bot);
                 logger.info("Film Bot started successfully.");
