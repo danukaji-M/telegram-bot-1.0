@@ -4,6 +4,10 @@ import asyncio
 
 bot_blueprint = Blueprint("bot", __name__)
 
+@bot_blueprint.route("/ping", methods=["GET"])
+def ping_route():
+    return jsonify({"status": "success", "message": "Pong!"})
+
 @bot_blueprint.route("/send-otp", methods=["POST"])
 def send_otp_route():
     data = request.get_json()
@@ -57,5 +61,5 @@ def create_group_route():
 
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
-    result = loop.run_until_complete(create_group(phone_number, group_name))
+    result = loop.run_until_complete(create_group(phone_number, group_name,users))
     return jsonify(result)

@@ -18,24 +18,24 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class FilmBot extends TelegramLongPollingBot {
+public class UploadBot extends TelegramLongPollingBot {
 
     private Logger logger;
-    private static FilmBot instance;
+    private static UploadBot instance;
 
     static AppConfig.Config config;
     String botToken;
 
-    private FilmBot(DefaultBotOptions option) {
+    private UploadBot(DefaultBotOptions option) {
         super(option);
     }
 
     // Static method for getting the single instance
-    public static FilmBot getInstance(DefaultBotOptions options) {
+    public static UploadBot getInstance(DefaultBotOptions options) {
         if (instance == null) {
-            synchronized (FilmBot.class) {
+            synchronized (UploadBot.class) {
                 if (instance == null) {
-                    instance = new FilmBot(options);
+                    instance = new UploadBot(options);
                 }
             }
         }
@@ -61,8 +61,11 @@ public class FilmBot extends TelegramLongPollingBot {
         logger.info("Received an update : {}",update);
         System.out.println(update);
         if(update.getMessage().hasDocument()) {
+
             logger.info("Document received in update.");
-            FileHandle fileHandle;
+            FileHandle fileHandle = new FileHandle();
+            fileHandle.setUser_id(update.getMessage().getChatId().toString());
+            fileHandle.createDownloadFolder();
             try {
                 Document doc = update.getMessage().getDocument();
                 GetFile getFile = new GetFile();
@@ -74,7 +77,6 @@ public class FilmBot extends TelegramLongPollingBot {
 
                 logger.info("Document file path: {}", torFilePath);
 
-                fileHandle = new FileHandle();
                 ExecutorService executor = Executors.newSingleThreadExecutor();
                 FileHandle finalFileHandle = fileHandle;
                 final Object lock = new Object();

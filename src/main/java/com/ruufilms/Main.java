@@ -5,14 +5,13 @@ package com.ruufilms;
 
 import com.ruufilms.accountaccessing.AccountHandlingBot;
 import com.ruufilms.bot.AdminBot;
-import com.ruufilms.bot.FilmBot;
+import com.ruufilms.bot.UploadBot;
 import com.ruufilms.bot.TvSeriesBot;
 import com.ruufilms.config.AppConfig;
 import com.ruufilms.migration.Migration;
 import com.ruufilms.services.FileHandle;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.jetbrains.annotations.Contract;
-import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
@@ -21,17 +20,11 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-
 public class Main {
     static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
     public static void main(String[] args) {
-        final Logger logger = LoggerFactory.getLogger(FilmBot.class);
+        final Logger logger = LoggerFactory.getLogger(UploadBot.class);
         try{
-            FileHandle file = new FileHandle();
-            file.CrateDownloadFolders();
-
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
             //initialized env reader
             Dotenv dotenv = Dotenv.load();
@@ -62,7 +55,7 @@ public class Main {
         Runnable fBotThread = ()->{
             DefaultBotOptions option = new DefaultBotOptions();
             option.setBaseUrl(config.getTelegramLocalServerHost());
-            FilmBot bot = FilmBot.getInstance(option);
+            UploadBot bot = UploadBot.getInstance(option);
             bot.initialize(config.getFilmBotApiKey(),config,logger);
             try {
                 botsApi.registerBot(bot);

@@ -15,8 +15,7 @@ public class FileHandle {
     private final String userHome = System.getProperty("user.home");
     private final Path downloadsPath = Paths.get(userHome,"Downloads");
     private final Path filmDownloadFolder = Paths.get(String.valueOf(downloadsPath),"Ruu_Bot","Films");
-
-    private String uploadFilePath;
+    private String user_id;
     private final String [] formats = {
             "MP4", "MKV", "AVI", "MOV", "WMV", "FLV", "WebM", "3GP", "MPEG", "MPEG-2",
             "MPEG-4", "TS", "VOB", "ProRes", "DNxHD", "ASF", "SWF", "OGV", "RM", "RMVB",
@@ -34,16 +33,34 @@ public class FileHandle {
         fileSearch(folder);
     }
 
-    public void CrateDownloadFolders(){
-        try{
-            if(Files.notExists(filmDownloadFolder)){
-                Files.createDirectories(filmDownloadFolder);
+    public String getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(String user_id) {
+        this.user_id = user_id;
+    }
+    /**
+     * Creates a unique download folder for a user based on their user_id.
+     *
+     * @return The path of the created folder as a String.
+     */
+    public void createDownloadFolder() {
+        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUser_id()); // Append user_id to the base folder path
+
+        try {
+            if (Files.notExists(userFolder)) {
+                Files.createDirectories(userFolder);
+                System.out.println("Created folder for user: " + userFolder);
+            } else {
+                System.out.println("Folder already exists for user: " + userFolder);
             }
-        }catch (IOException e){
-            System.err.println("Error creating Downloads folder: " + e.getMessage());
+        } catch (IOException e) {
+            System.err.println("Error creating folder for user " + getUser_id() + ": " + e.getMessage());
             e.printStackTrace();
         }
     }
+
 
     /**
      * Creates a folder at the specified path.
@@ -85,7 +102,8 @@ public class FileHandle {
     }
 
     public List<String> getUploadFilePath(){
-        return fileSearch(new File(filmDownloadFolder.toString()));
+        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUser_id());
+        return fileSearch(new File(userFolder.toString()));
     }
 
     private boolean matchesFormat(String fileName) {
@@ -100,12 +118,9 @@ public class FileHandle {
     }
 
 
-    public void setUploadFilePath(String uploadFilePath) {
-        this.uploadFilePath = uploadFilePath;
-    }
-
     public File getFilmDownloadFolder() {
-        return new File(String.valueOf(filmDownloadFolder));
+        Path userFolder = Paths.get(filmDownloadFolder.toString(), getUser_id());
+        return new File(String.valueOf(userFolder));
     }
 
     public void deleteFolder() {

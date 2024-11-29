@@ -1,6 +1,6 @@
 package com.ruufilms.accountaccessing;
 
-import com.ruufilms.bot.FilmBot;
+import com.ruufilms.bot.UploadBot;
 import com.ruufilms.config.AppConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 public class AccountHandlingBot extends TelegramLongPollingBot {
-    private static final Logger logger = LoggerFactory.getLogger(FilmBot.class);
+    private static final Logger logger = LoggerFactory.getLogger(UploadBot.class);
     static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
     boolean Stat = false;
     boolean password = false;

@@ -4,11 +4,13 @@ from telethon.tl.functions.messages import EditChatDefaultBannedRightsRequest
 from telethon.tl.types import ChatBannedRights
 from telethon.tl.types import InputPeerUser
 from telethon.errors import SessionPasswordNeededError
+from telethon.tl.functions.messages import ExportChatInviteRequest
 import os
 
 # Telegram API credentials
 API_ID = 24150008  # Set your API_ID
 API_HASH = "b63bf4acbec8984467850b3474d218ef"  # Set your API_HASH
+
 
 async def send_otp(phone_number):
     client = TelegramClient(f"sessions/{phone_number}", API_ID, API_HASH)
@@ -60,7 +62,7 @@ async def get_account_data(phone_number):
         await client.disconnect()
         return {"status": "error", "message": "User not authorized. Please log in first."}
     
-async def create_group(phone_number, group_name):
+async def create_group(phone_number, group_name,users):
     """
     Create a new group with the given group name, without adding any users.
     """
@@ -94,10 +96,13 @@ async def create_group(phone_number, group_name):
                 pin_messages=True,
             )
             await client(EditChatDefaultBannedRightsRequest(group.id, banned_rights))
+            invite = await client(ExportChatInviteRequest(group.id))
+            group_link = invite.link 
 
             group_data = {
                 "group_name": group.title,
-                "group_id": group.id
+                "group_id": group.id,
+                "group_link": group_link
             }
 
             await client.disconnect()

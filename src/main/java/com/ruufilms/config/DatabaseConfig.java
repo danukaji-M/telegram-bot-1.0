@@ -29,6 +29,16 @@ public class DatabaseConfig {
         return statement.executeUpdate(query);
     }
 
+    public static int executePreparedUpdate(String sql, Object... params) throws SQLException {
+        Connection conn = getConnection();
+        try (PreparedStatement preparedStatement = conn.prepareStatement(sql)) {
+            for (int i = 0; i < params.length; i++) {
+                preparedStatement.setObject(i + 1, params[i]);
+            }
+            return preparedStatement.executeUpdate();
+        }
+    }
+
     public static void closeConnection() throws SQLException{
         if(connection != null && !connection.isClosed()){
             connection.close();
