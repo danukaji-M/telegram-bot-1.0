@@ -6,7 +6,9 @@ import com.ruufilms.config.DatabaseConfig;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class UserModel {
@@ -40,20 +42,17 @@ public class UserModel {
         }
     }
 
-    public Map<String, Object> getAllUsers(){
-        try {
-            Map<String, Object> userCache = new HashMap<>();
+    public HashMap<String, User> getAllUsers() {
+        HashMap<String, User> userCache = new HashMap<>();
 
+        try {
             ResultSet resultSet = DatabaseConfig.executeQuery(
-                    "SELECT user.user_id, user.username, user.create_time, user_type.name AS user_type_name " +
-                            "FROM user " +
-                            "JOIN user_type " +
-                            "ON user.user_type_type_id = user_type.type_id"
+                    "SELECT * FROM user"
             );
 
-            // Iterate over each row in the result set
             while (resultSet.next()) {
                 User user = new User();
+
                 String userId = resultSet.getString("user_id");
                 user.setUserId(userId);
                 user.setUsername(resultSet.getString("username"));
@@ -62,12 +61,10 @@ public class UserModel {
                 userCache.put(userId, user);
             }
             DatabaseConfig.closeConnection();
-
-            return userCache;
         } catch (SQLException e) {
             e.printStackTrace();
             return null;
         }
+        return userCache;
     }
-
 }

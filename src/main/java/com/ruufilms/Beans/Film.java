@@ -56,6 +56,19 @@ public class Film {
     public Set<String> getGenres() {
         return genres;
     }
+
+    @Override
+    public String toString() {
+        return "Film{" +
+                "filmId='" + filmId + '\'' +
+                ", filmName='" + filmName + '\'' +
+                ", producer='" + producer + '\'' +
+                ", link='" + link + '\'' +
+                ", year='" + year + '\'' +
+                ", franchiseId=" + franchiseId +
+                ", genres=" + genres +
+                '}';
+    }
 }
 
 //    public void createFilm(String filmId, String filmName, String producer, String link, String year, String franchise_id){

@@ -121,7 +121,7 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Table `ruu_movies`.`groups`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ruu_movies`.`groups` (
-  `cgroup_id` VARCHAR(32) NOT NULL,
+  `group_id` VARCHAR(32) NOT NULL,
   `name` VARCHAR(255) NOT NULL,
   PRIMARY KEY (`cgroup_id`))
 ENGINE = InnoDB
@@ -198,12 +198,12 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `ruu_movies`.`user_has_groups` (
   `user_user_id` VARCHAR(32) NULL DEFAULT NULL,
-  `groups_cgroup_id` VARCHAR(32) NULL DEFAULT NULL,
-  INDEX `fk_user_has_groups_groups1_idx` (`groups_cgroup_id` ASC) VISIBLE,
+  `groups_group_id` VARCHAR(32) NULL DEFAULT NULL,
+  INDEX `fk_user_has_groups_groups1_idx` (`groups_group_id` ASC) VISIBLE,
   INDEX `fk_user_has_groups_user1_idx` (`user_user_id` ASC) VISIBLE,
   CONSTRAINT `fk_user_has_groups_groups1`
-    FOREIGN KEY (`groups_cgroup_id`)
-    REFERENCES `ruu_movies`.`groups` (`cgroup_id`),
+    FOREIGN KEY (`groups_group_id`)
+    REFERENCES `ruu_movies`.`groups` (`group_id`),
   CONSTRAINT `fk_user_has_groups_user1`
     FOREIGN KEY (`user_user_id`)
     REFERENCES `ruu_movies`.`user` (`user_id`))

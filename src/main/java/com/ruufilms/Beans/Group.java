@@ -1,12 +1,19 @@
 package com.ruufilms.Beans;
 
-import com.ruufilms.config.DatabaseConfig;
-
 import java.sql.SQLException;
 
 public class Group {
     private String groupId;
     private String name;
+    private String groupLink;
+
+    public String getGroupLink() {
+        return groupLink;
+    }
+
+    public void setGroupLink(String groupLink) {
+        this.groupLink = groupLink;
+    }
 
     public String getName() {
         return name;
@@ -24,18 +31,5 @@ public class Group {
         this.groupId = groupId;
     }
 
-    public void createGroup(String groupId, String name){
-        String sql = "INSERT INTO group(`group_id`,`name`) VALUES (?,?)";
-        try{
-            int rowsAffected = DatabaseConfig.executePreparedUpdate(sql,groupId,name);
-            if(rowsAffected>0){
-                System.out.println("Successfully Created");
-            }else{
-                System.out.println("Something went wrong");
-            }
-            DatabaseConfig.closeConnection();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
+
 }

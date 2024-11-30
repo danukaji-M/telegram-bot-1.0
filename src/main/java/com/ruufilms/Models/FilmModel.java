@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class FilmModel {
 
-    private Map<String, Film> filmsCache = new HashMap<>();
+    private HashMap<String, Film> filmsCache = new HashMap<>();
 
     public void loadFilmsIntoCache() {
         String query = "SELECT f.film_id, f.film_name, f.producer, f.link, f.year, f.franchise_id, g.name AS genre " +
@@ -48,7 +48,7 @@ public class FilmModel {
         }
     }
 
-    public Map<String, Film> getAllFilms() {
+    public HashMap<String, Film> getAllFilms() {
         return filmsCache;
     }
 

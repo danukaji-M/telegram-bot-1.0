@@ -1,5 +1,6 @@
 package com.ruufilms.bot;
 
+import com.ruufilms.Beans.Stickers;
 import com.ruufilms.config.AppConfig;
 import com.ruufilms.Beans.User;
 import com.ruufilms.services.FileHandle;
@@ -15,17 +16,27 @@ import org.telegram.telegrambots.meta.api.objects.InputFile;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+import java.util.HashMap;
+
 
 public class UploadBot extends TelegramLongPollingBot {
+    private boolean film = false;
+    private boolean tvSeries = false;
+    private boolean bseason = false;
+    private boolean newSeries = false;
+    private boolean oldSeries = false;
 
+    private String season;
     private Logger logger;
     static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
     String botToken;
     private User user;
+    Stickers stickers;
 
-    public UploadBot(DefaultBotOptions option, String botToken, Logger logger) {
+    public UploadBot(DefaultBotOptions option, String botToken, Logger logger, Stickers stickers) {
         super(option,botToken);
         this.logger = logger;
+        this.stickers = stickers;
     }
 
 
@@ -36,20 +47,18 @@ public class UploadBot extends TelegramLongPollingBot {
 
     @Override
     public void onUpdateReceived(Update update) {
-        FileHandle fileHandle = new FileHandle(update.getMessage().getChatId().toString());
-        System.out.println(update.getMessage().getChatId());
-        logger.info("Received update: {}", update);
-        if (update.getMessage() != null && update.getMessage().getFrom() != null) {
-            String userId = update.getMessage().getFrom().getId().toString();
-            logger.info("Extracted user ID: {}", userId);
-        } else {
-            logger.error("Message or User data is null in the update: {}", update);
-        }
         assert config.isDebugEnabled() : "Update Message Incoming";
         logger.info("Received an update : {}",update);
         System.out.println(update);
-        if(update.getMessage().hasDocument()) {
-
+        if(update.getMessage().getText().equals("/setFilm")){
+            film = true;
+            tvSeries = false;
+        }else if(update.getMessage().getText().equals("/setSeries")){
+            film = false;
+            tvSeries = true;
+        }
+        if(update.getMessage().hasDocument() && film) {
+            FileHandle fileHandle = new FileHandle(update.getMessage().getChatId().toString());
             logger.info("Document received in update.");
             fileHandle.createDownloadFolder();
             try {
@@ -93,6 +102,33 @@ public class UploadBot extends TelegramLongPollingBot {
             } catch (Throwable e) {
                 logger.error("Error while handling document", e);
             }
+        }
+        if(tvSeries){
+            if(update.getMessage().getText().startsWith("/season")){
+                season = update.getMessage().getText().substring(7).trim();
+                bseason = true;
+            }
+        }
+        if(tvSeries && bseason){
+            if(update.getMessage().getText().equals("/old")){
+                oldSeries = true;
+                newSeries = false;
+            }else if (update.getMessage().getText().equals("/new")){
+                oldSeries = false;
+                newSeries = true;
+            }
+        }
+        //
+        if(tvSeries && update.getMessage().hasDocument() && (Integer.valueOf(season) > 0)){
+            FileHandle fileHandle = new FileHandle(update.getMessage().getChatId().toString());
+        }
+
+        if(update.getMessage().getText().equals("/reset")){
+            film = false;
+            tvSeries = false;
+            bseason = false;
+            newSeries = false;
+            oldSeries = false;
         }
     }
 }
