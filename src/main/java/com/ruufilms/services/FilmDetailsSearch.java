@@ -15,13 +15,14 @@ public class FilmDetailsSearch {
     public Map<String, Object> FilmData(String name) throws IOException {
         // Build the API URL with the movie name and API key
         String urlString = "http://omdbapi.com/?t=" + name.replace(" ", "+") + "&apikey=a6c592ab";
+        System.out.println("Requesting URL: " + urlString); // Debugging
         URL url = new URL(urlString);
 
         // Open a connection to the URL
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
         int responseCode = connection.getResponseCode();
-        System.out.println("Response Code: " + responseCode); // Print response code for debugging
+        System.out.println("Response Code: " + responseCode); // Debugging
 
         Map<String, Object> movieMap = new HashMap<>();
 
@@ -36,13 +37,13 @@ public class FilmDetailsSearch {
             in.close();
 
             // Print out the raw response to check the structure (for debugging)
-            System.out.println("Response: " + response.toString());
+            System.out.println("Raw Response: " + response);
 
             // Parse the response as a JSONObject
             JSONObject myResponse = new JSONObject(response.toString());
 
             // Check if the response is valid
-            if ("True".equals(myResponse.getString("Response"))) {
+            if ("True".equals(myResponse.optString("Response", "False"))) {
                 // Populate the movieMap with the fields from the response
                 movieMap.put("Title", myResponse.optString("Title", "N/A"));
                 movieMap.put("Year", myResponse.optString("Year", "N/A"));
@@ -67,7 +68,6 @@ public class FilmDetailsSearch {
                 movieMap.put("BoxOffice", myResponse.optString("BoxOffice", "N/A"));
                 movieMap.put("Production", myResponse.optString("Production", "N/A"));
                 movieMap.put("Website", myResponse.optString("Website", "N/A"));
-                movieMap.put("Response", myResponse.optString("Response", "False"));
 
                 // Extract the Ratings array
                 JSONArray ratingsArray = myResponse.optJSONArray("Ratings");
@@ -81,16 +81,14 @@ public class FilmDetailsSearch {
                 movieMap.put("Ratings", ratingsMap);
 
             } else {
-                // Handle the case when the response is not "True"
-                movieMap.put("Error", myResponse.optString("Error", "Unknown error"));
+                // Log the error if the response is invalid
+                String error = myResponse.optString("Error", "Unknown error");
+                System.err.println("OMDB API Error: " + error);
+                movieMap.put("Error", error);
             }
 
-            // Print out the complete movie data from the movieMap
-            for (Map.Entry<String, Object> entry : movieMap.entrySet()) {
-                System.out.println(entry.getKey() + ": " + entry.getValue());
-            }
         } else {
-            System.out.println("Failed to get a valid response.");
+            System.err.println("Failed to get a valid response. HTTP Code: " + responseCode);
         }
 
         return movieMap; // Return the populated movie map
@@ -98,8 +96,10 @@ public class FilmDetailsSearch {
 
     public static void main(String[] args) {
         try {
-            Map<String, Object> movieDetails = new FilmDetailsSearch().FilmData("Swallowed Star");
-            // Optionally, print the returned movie details
+            FilmDetailsSearch search = new FilmDetailsSearch();
+            Map<String, Object> movieDetails = search.FilmData("The Lord of the Rings: The Rings of Power");
+
+            // Print the movie details
             System.out.println("\nReturned Movie Details:");
             for (Map.Entry<String, Object> entry : movieDetails.entrySet()) {
                 System.out.println(entry.getKey() + ": " + entry.getValue());

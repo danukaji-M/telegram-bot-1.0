@@ -39,6 +39,17 @@ public class DatabaseConfig {
         }
     }
 
+    public static ResultSet executePreparedQuery(String sql, Object... params) throws SQLException {
+        Connection conn = getConnection();
+        PreparedStatement preparedStatement = conn.prepareStatement(sql);
+        // Set parameters in the query
+        for (int i = 0; i < params.length; i++) {
+            preparedStatement.setObject(i + 1, params[i]);
+        }
+        return preparedStatement.executeQuery();  // Executes the SELECT query and returns the ResultSet
+    }
+
+
     public static void closeConnection() throws SQLException{
         if(connection != null && !connection.isClosed()){
             connection.close();

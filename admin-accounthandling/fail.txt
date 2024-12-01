@@ -1,0 +1,86 @@
+async def create_private_channel(phone_number, channel_name, users, photo_path=None, channel_about=None):
+    client = TelegramClient(f"sessions/{phone_number}", API_ID, API_HASH)
+    await client.connect()
+
+    if await client.is_user_authorized():
+        try:
+            # Create the private channel
+            result = await client(CreateChannelRequest(
+                title=channel_name,
+                about= channel_about,
+                megagroup=False  # Set to False to create a channel
+            ))
+            channel = result.chats[0]
+
+            # Upload a profile picture (if provided)
+            if photo_path:
+                try:
+                    upload_photo = await client.upload_file(photo_path)
+                    await client(EditPhotoRequest(channel.id, InputChatUploadedPhoto(upload_photo)))
+                except Exception as e:
+                    print(f"Failed to set channel photo: {str(e)}")
+
+            # Add default bots and other users
+            valid_users = []
+            bot_ids = [7960468509, 1394530085]  # Bot IDs
+            for bot_id in bot_ids:
+                try:
+                    bot_entity = await client.get_input_entity(bot_id)
+                    valid_users.append(bot_entity)
+                except Exception as e:
+                    print(f"Error processing bot with ID {bot_id}: {str(e)}")
+
+            for user in users:
+                try:
+                    user_entity = await client.get_input_entity(user)
+                    valid_users.append(user_entity)
+                except Exception as e:
+                    print(f"Error processing user {user}: {str(e)}")
+
+            # Add users to the channel
+            if valid_users:
+                try:
+                    await client(InviteToChannelRequest(channel.id, valid_users))
+                except UserAlreadyParticipantError:
+                    print("Some users are already part of the channel.")
+                except Exception as e:
+                    print(f"Error adding users: {str(e)}")
+
+            # Grant admin rights to bots
+            admin_rights = ChatAdminRights(
+                change_info=True,
+                post_messages=True,
+                edit_messages=True,
+                delete_messages=True,
+                ban_users=True,
+                invite_users=True,
+                pin_messages=True,
+                add_admins=False,  # Adjust as needed
+                manage_call=True,
+            )
+            for bot_id in bot_ids:
+                try:
+                    bot_entity = await client.get_input_entity(bot_id)
+                    await client(EditAdminRequest(channel.id, bot_entity, admin_rights, f"Admin Bot {bot_id}"))
+                except Exception as e:
+                    print(f"Failed to grant admin rights to bot {bot_id}: {str(e)}")
+
+            # Generate an invite link
+            invite = await client(ExportChatInviteRequest(channel.id))
+            channel_link = invite.link
+
+            channel_data = {
+                "channel_name": channel.title,
+                "channel_id": channel.id,
+                "channel_link": channel_link
+            }
+
+            await client.disconnect()
+            return {"status": "success", "channel_data": channel_data}
+
+        except Exception as e:
+            await client.disconnect()
+            return {"status": "error", "message": f"Failed to create channel: {str(e)}"}
+    else:
+        await client.disconnect()
+        return {"status": "error", "message": "User not authorized. Please log in first."}

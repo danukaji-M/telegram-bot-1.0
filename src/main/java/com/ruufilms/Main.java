@@ -51,7 +51,7 @@ public class Main {
             StickerModel stickerModel = new StickerModel();
             Stickers stickers = stickerModel.loadSeasonStickers();
 
-            Thread thread1 = getThread1(config, botsApi, logger, stickers);
+            Thread thread1 = getThread1(config, botsApi, logger, stickers, userHashMap);
             Thread thread2 = getThread2(config, botsApi, logger);
             Thread thread3 = getThread3(config, botsApi,logger);
             Thread thread4 = getThread4(config, botsApi,logger);
@@ -71,11 +71,11 @@ public class Main {
 
     //Film Upload Bot
     @Contract("_, _, _ -> new")
-    private static Thread getThread1(AppConfig.Config config, TelegramBotsApi botsApi, Logger logger, Stickers stickers) {
+    private static Thread getThread1(AppConfig.Config config, TelegramBotsApi botsApi, Logger logger, Stickers stickers , HashMap<String, User> user) {
         Runnable fBotThread = ()->{
             DefaultBotOptions option = new DefaultBotOptions();
             option.setBaseUrl(config.getTelegramLocalServerHost());
-            UploadBot bot = new UploadBot(option,config.getFilmBotApiKey(),logger, stickers);
+            UploadBot bot = new UploadBot(option,config.getFilmBotApiKey(),logger, stickers, user);
             try {
                 botsApi.registerBot(bot);
                 logger.info("Film Bot started successfully.");

@@ -6,6 +6,17 @@ public class GroupData {
     private String phone_number;
     private String group_name;
 
+    public String getProfile_path() {
+        return profile_path;
+    }
+
+    public void setProfile_path(String profile_path) {
+        this.profile_path = profile_path;
+    }
+
+    private String profile_path;
+
+
     public String getPhone_number() {
         return phone_number;
     }

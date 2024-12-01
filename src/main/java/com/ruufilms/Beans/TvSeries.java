@@ -4,13 +4,23 @@ import com.ruufilms.config.DatabaseConfig;
 
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.List;
 
 public class TvSeries {
     private String groupId;
     private String name;
     private String groupLink;
     private String year;
+    private List<String> genres;
     private String createdTime;
+
+    public List<String> getGenres(){
+        return genres;
+    }
+
+    public void setGenres(List<String> genres){
+        this.genres = genres;
+    }
 
     public String getGroupId() {
         return groupId;
@@ -52,19 +62,4 @@ public class TvSeries {
         this.createdTime = createdTime;
     }
 
-    public void createTvSeries(String groupId, String name, String groupLink, String year){
-        String sql = "INSER INTO tv_series(`group_id`,`name`,`group_link`,`year`,`created_time`) VALUES(?,?,?,?,?)";
-        try{
-            Timestamp timeStamp = new Timestamp(System.currentTimeMillis());
-            int rowsAffected = DatabaseConfig.executePreparedUpdate(sql, groupId,name,groupLink,year,timeStamp);
-            if(rowsAffected>0){
-                System.out.println("Successfully Created");
-            }else{
-                System.out.println("Something went wrong");
-            }
-            DatabaseConfig.closeConnection();
-        }catch (SQLException e){
-            e.printStackTrace();
-        }
-    }
 }
