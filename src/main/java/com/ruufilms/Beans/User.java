@@ -1,32 +1,21 @@
 package com.ruufilms.Beans;
 
 import java.sql.Timestamp;
-import java.util.HashSet;
+import java.util.List;
 
 public class User {
-    private String userId;
+    private String id;
     private String username;
-    private int userType;
-    private Timestamp createsAt;
+    private Timestamp create_time;
+    private int user_type_type_id;
+    private List<String> groups;
 
-    // Parameterized constructor
-    public User(String userId, String username, int userType, Timestamp createsAt) {
-        this.userId = userId;
-        this.username = username;
-        this.userType = userType;
-        this.createsAt = createsAt;
+    public String getId() {
+        return id;
     }
 
-    // Default constructor (optional)
-    public User() {
-    }
-
-    public Timestamp getCreatesAt() {
-        return createsAt;
-    }
-
-    public void setCreatesAt(Timestamp createsAt) {
-        this.createsAt = createsAt;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getUsername() {
@@ -37,19 +26,28 @@ public class User {
         this.username = username;
     }
 
-    public int getUserType() {
-        return userType;
+    public Timestamp getCreate_time() {
+        return create_time;
     }
 
-    public void setUserType(int userType) {
-        this.userType = userType;
+    public void setCreate_time(Timestamp create_time) {
+        this.create_time = create_time;
     }
 
-    public String getUserId() {
-        return userId;
+
+    public int getUser_type_type_id() {
+        return user_type_type_id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setUser_type_type_id(int user_type_type_id) {
+        this.user_type_type_id = user_type_type_id;
+    }
+
+    public List<String> getGroups() {
+        return groups;
+    }
+
+    public void setGroups(List<String> groups) {
+        this.groups = groups;
     }
 }

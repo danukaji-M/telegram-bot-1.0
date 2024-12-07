@@ -97,7 +97,7 @@ public class FilmDetailsSearch {
     public static void main(String[] args) {
         try {
             FilmDetailsSearch search = new FilmDetailsSearch();
-            Map<String, Object> movieDetails = search.FilmData("The Lord of the Rings: The Rings of Power");
+            Map<String, Object> movieDetails = search.FilmData("Inception");
 
             // Print the movie details
             System.out.println("\nReturned Movie Details:");
@@ -109,3 +109,4 @@ public class FilmDetailsSearch {
         }
     }
 }
+//ksxLZDGaE4l6cwpninyynyqVkrWaCCZNdBnVjyV90Wj2NBneT6ub1WOh

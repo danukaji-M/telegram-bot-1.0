@@ -1,25 +1,24 @@
 package com.ruufilms.Beans;
 
-import com.ruufilms.config.DatabaseConfig;
-
-import java.sql.SQLException;
-import java.sql.Timestamp;
 import java.util.List;
 
 public class TvSeries {
+    private int id;
     private String groupId;
-    private String name;
     private String groupLink;
-    private String year;
+    private String released;
+    private String addedYear;
+    private float imdb;
+    private String director;
     private List<String> genres;
-    private String createdTime;
 
-    public List<String> getGenres(){
-        return genres;
+
+    public int getId() {
+        return id;
     }
 
-    public void setGenres(List<String> genres){
-        this.genres = genres;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getGroupId() {
@@ -30,22 +29,6 @@ public class TvSeries {
         this.groupId = groupId;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getYear() {
-        return year;
-    }
-
-    public void setYear(String year) {
-        this.year = year;
-    }
-
     public String getGroupLink() {
         return groupLink;
     }
@@ -54,12 +37,43 @@ public class TvSeries {
         this.groupLink = groupLink;
     }
 
-    public String getCreatedTime() {
-        return createdTime;
+    public String getReleased() {
+        return released;
     }
 
-    public void setCreatedTime(String createdTime) {
-        this.createdTime = createdTime;
+    public void setReleased(String released) {
+        this.released = released;
     }
 
+    public String getAddedYear() {
+        return addedYear;
+    }
+
+    public void setAddedYear(String addedYear) {
+        this.addedYear = addedYear;
+    }
+
+    public float getImdb() {
+        return imdb;
+    }
+
+    public void setImdb(float imdb) {
+        this.imdb = imdb;
+    }
+
+    public String getDirector() {
+        return director;
+    }
+
+    public void setDirector(String director) {
+        this.director = director;
+    }
+
+    public List<String> getGenres() {
+        return genres;
+    }
+
+    public void setGenres(List<String> genres) {
+        this.genres = genres;
+    }
 }

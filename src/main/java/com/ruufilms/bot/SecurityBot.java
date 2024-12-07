@@ -1,8 +1,6 @@
 package com.ruufilms.bot;
 
-import com.ruufilms.Beans.Group;
-import com.ruufilms.Beans.Stickers;
-import com.ruufilms.Models.GroupModel;
+
 import com.ruufilms.config.WordArtConfig;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,20 +18,14 @@ import java.util.*;
 
 public class SecurityBot extends TelegramLongPollingBot {
     String botToken;
-    HashMap<String,com.ruufilms.Beans.User> user;
     Logger logger = LogManager.getLogger(SecurityBot.class);
-    HashMap<String, Group> group;
     boolean getInfo = false;
     String groupId = null;
     String groupLink = null;
     String groupName = null;
-    Stickers stickers;
-    public SecurityBot(String botToken, HashMap<String,com.ruufilms.Beans.User> user, HashMap<String, Group> group, Stickers stickers){
+    public SecurityBot(String botToken){
         super(botToken);
         this.botToken = botToken;
-        this.user = user;
-        this.group = group;
-        this.stickers = stickers;
     }
 
     @Override
@@ -41,7 +33,7 @@ public class SecurityBot extends TelegramLongPollingBot {
         System.out.println(update.getMessage().getSticker());
         SendSticker sendSticker = new SendSticker();
         sendSticker.setChatId(update.getMessage().getChatId());
-        sendSticker.setSticker(new InputFile(stickers.getSeasonSticker(5)));
+        sendSticker.setSticker(new InputFile("stickers.getSeasonSticker(5)"));
         try{
             execute(sendSticker);
         }catch (TelegramApiException e){
@@ -53,11 +45,7 @@ public class SecurityBot extends TelegramLongPollingBot {
             List<User> newMembers = update.getMessage().getNewChatMembers();
             for (User newMember : newMembers) {
                 handleNewMember(newMember, update.getMessage().getChatId());
-                if(this.user.containsKey(update.getMessage().getChatId().toString())){
-                    updateRegisteredUser(newMember, update.getMessage().getChatId());
-                }else{
-                    registerNewUser(newMember, update.getMessage().getChatId());
-                }
+
             }
         }else if(update.getMessage().getLeftChatMember() != null){
             System.out.println("A Member Left From Group");
@@ -109,13 +97,6 @@ public class SecurityBot extends TelegramLongPollingBot {
                     response.setChatId(update.getMessage().getChatId().toString());
                     response.setText("Group Info Received:\n- ID: " + groupId + "\n- Link: " + groupLink + "\n- Name: " + groupName + WordArtConfig.getWordArt());
                     try {
-                        GroupModel groupModel = new GroupModel();
-                        groupModel.createGroup(groupId,groupName,groupLink);
-                        Group groupBean = new Group();
-                        groupBean.setGroupLink(groupLink);
-                        groupBean.setName(groupName);
-                        groupBean.setGroupId(groupId);
-                        group.put(groupId,groupBean);
                         execute(response );
                         getInfo = false;
                     } catch (TelegramApiException e) {

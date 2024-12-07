@@ -3,13 +3,6 @@
  */
 package com.ruufilms;
 
-import com.ruufilms.Beans.Film;
-import com.ruufilms.Beans.Group;
-import com.ruufilms.Beans.Stickers;
-import com.ruufilms.Models.FilmModel;
-import com.ruufilms.Models.GroupModel;
-import com.ruufilms.Models.StickerModel;
-import com.ruufilms.Models.UserModel;
 import com.ruufilms.accountaccessing.AccountHandlingBot;
 import com.ruufilms.bot.AdminBot;
 import com.ruufilms.bot.SecurityBot;
@@ -17,7 +10,6 @@ import com.ruufilms.bot.UploadBot;
 import com.ruufilms.bot.TvSeriesBot;
 import com.ruufilms.config.AppConfig;
 
-import com.ruufilms.Beans.User;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Contract;
@@ -27,35 +19,21 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
 import org.telegram.telegrambots.updatesreceivers.DefaultBotSession;
 
-import java.util.HashMap;
-
 public class Main {
     static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
-    User user = new User();
     public static void main(String[] args) {
         final Logger logger = LogManager.getLogger(UploadBot.class);
         try{
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
 
-            //load all Caches
-            UserModel users = new UserModel();
-            HashMap<String, User> userHashMap = users.getAllUsers();
 
-            FilmModel filmModel = new FilmModel();
-            filmModel.loadFilmsIntoCache();
-            HashMap<String, Film> filmHashMap = filmModel.getAllFilms();
 
-            GroupModel groupModel = new GroupModel();
-            HashMap<String, Group> groupHashMap = groupModel.getAllGroupData();
 
-            StickerModel stickerModel = new StickerModel();
-            Stickers stickers = stickerModel.loadSeasonStickers();
-
-            Thread thread1 = getThread1(config, botsApi, logger, stickers, userHashMap);
+            Thread thread1 = getThread1(config, botsApi, logger);
             Thread thread2 = getThread2(config, botsApi, logger);
             Thread thread3 = getThread3(config, botsApi,logger);
             Thread thread4 = getThread4(config, botsApi,logger);
-            Thread thread5 = getThread5(config, botsApi, logger, userHashMap, groupHashMap, stickers);
+            Thread thread5 = getThread5(config, botsApi, logger);
             //Thread Start Area
 //            thread.start();
             thread5.start();
@@ -71,11 +49,11 @@ public class Main {
 
     //Film Upload Bot
     @Contract("_, _, _ -> new")
-    private static Thread getThread1(AppConfig.Config config, TelegramBotsApi botsApi, Logger logger, Stickers stickers , HashMap<String, User> user) {
+    private static Thread getThread1(AppConfig.Config config, TelegramBotsApi botsApi, Logger logger) {
         Runnable fBotThread = ()->{
             DefaultBotOptions option = new DefaultBotOptions();
             option.setBaseUrl(config.getTelegramLocalServerHost());
-            UploadBot bot = new UploadBot(option,config.getFilmBotApiKey(),logger, stickers, user);
+            UploadBot bot = new UploadBot(option,config.getFilmBotApiKey(),logger);
             try {
                 botsApi.registerBot(bot);
                 logger.info("Film Bot started successfully.");
@@ -132,9 +110,9 @@ public class Main {
         return new Thread(thread);
     }
 
-    private static  Thread getThread5(AppConfig.Config config, TelegramBotsApi botsApi, Logger logger, HashMap<String, User> user, HashMap<String, Group> group, Stickers stickers){
+    private static  Thread getThread5(AppConfig.Config config, TelegramBotsApi botsApi, Logger logger){
         Runnable thread =()->{
-            LongPollingBot bot = new SecurityBot(config.getSecurityBotApi(), user,group, stickers);
+            LongPollingBot bot = new SecurityBot(config.getSecurityBotApi());
             try {
                 botsApi.registerBot(bot);
                 logger.info("Inspect Bot successfully Started");
@@ -143,5 +121,8 @@ public class Main {
             }
         };
         return new Thread(thread);
+    }
+
+    public static class MainTest {
     }
 }

@@ -142,6 +142,7 @@ public enum AppConfig {
         public String getFlaskUrl(){
             return get("FLASK_URL");
         }
+
         public String getFilmBotApiKey() {
             return get("FILM_BOT_API_KEY");
         }
@@ -153,7 +154,6 @@ public enum AppConfig {
         public String getRedisHost() {
             return get("REDIS_HOST");
         }
-
 
         public String getAdminBotApiKey() {
             return get("ADMIN_BOT_API_KEY");
@@ -423,14 +423,12 @@ public enum AppConfig {
             return get("BOOK_DOWNLOAD_FOLDER");
         }
 
-        public String getTelegramLocalServerInstallationPath() {
-            return get("TELEGRAM_LOCAL_SERVER_INSTALLATION_PATH");
-        }
+        public String getTelegramLocalServerInstallationPath() { return get("TELEGRAM_LOCAL_SERVER_INSTALLATION_PATH"); }
 
         public String getUniversalPath() {
             return get("UNIVERSAL_PATH");
         }
-        // Add getter methods for all configuration properties
+
         public String getAccountAdminBotApiKey() {
             return get("ACCOUNT_ADMINISTRAION_BOT_API");
         }

@@ -2,7 +2,6 @@ package com.ruufilms.accountaccessing.spring;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ruufilms.Beans.ChannelData;
 import com.ruufilms.accountaccessing.GroupData;
 
 import java.io.*;
@@ -69,9 +68,9 @@ public class FlaskController {
         return null;
     }
 
-    public String createChannel(ChannelData channelData){
+    public String createChannel(){
         try{
-            String jsonPayload = objectMapper.writeValueAsString(channelData);
+            String jsonPayload = objectMapper.writeValueAsString("channelData");
             HttpURLConnection connection = (HttpURLConnection) new URL(URL + "create-channel").openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json");

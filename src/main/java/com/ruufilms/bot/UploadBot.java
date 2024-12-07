@@ -3,33 +3,31 @@ package com.ruufilms.bot;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.ruufilms.Beans.ChannelData;
-import com.ruufilms.Beans.Stickers;
-import com.ruufilms.Models.TvSeriesModel;
 import com.ruufilms.accountaccessing.spring.FlaskController;
 import com.ruufilms.config.AppConfig;
-import com.ruufilms.Beans.User;
+import com.ruufilms.enums.Commands;
 import com.ruufilms.services.FileHandle;
 import com.ruufilms.services.FilmDetailsSearch;
 import com.ruufilms.services.TorrentService;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.GetFile;
 import org.telegram.telegrambots.meta.api.methods.send.SendDocument;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.send.SendSticker;
 import org.telegram.telegrambots.meta.api.objects.*;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 
 public class UploadBot extends TelegramLongPollingBot {
+    private String season;
+    private Logger logger;
+    static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
     private boolean film = false;
     private boolean tvSeries = false;
     private boolean bseason = false;
@@ -39,12 +37,7 @@ public class UploadBot extends TelegramLongPollingBot {
     private boolean start = false;
     private boolean setGroup = false;
     private boolean dataRecieve = false;
-    private String season;
-    private Logger logger;
-    static AppConfig.Config config = new AppConfig.Config(AppConfig.INSTANCE.properties);
     String botToken;
-    HashMap<String, User> user;
-    Stickers stickers;
     String channelId;
     String channelName;
     String channelLink;
@@ -57,11 +50,9 @@ public class UploadBot extends TelegramLongPollingBot {
     String genres;
     String plot;
     Map<String, Object> details;
-    public UploadBot(DefaultBotOptions option, String botToken, Logger logger, Stickers stickers, HashMap<String , User> user) {
+    public UploadBot(DefaultBotOptions option, String botToken, Logger logger) {
         super(option,botToken);
         this.logger = logger;
-        this.stickers = stickers;
-        this.user = user;
     }
 
 
@@ -75,16 +66,16 @@ public class UploadBot extends TelegramLongPollingBot {
         assert config.isDebugEnabled() : "Update Message Incoming";
         logger.info("Received an update : {}",update);
         System.out.println(update);
-        if(update.getMessage().getText().equals("/start")){
+        if(update.getMessage().getText().equals(Commands.START.getCommand())){
             start = true;
         }
         if(start){
             //set film for the upload a film
-            if(update.getMessage().getText().equals("/setfilm")){
+            if(update.getMessage().getText().equals(Commands.SETFILM.getCommand())){
                 film = true;
                 tvSeries = false;
                 //set Series for the upload TvSeries
-            }else if(update.getMessage().getText().equals("/setseries")){
+            }else if(update.getMessage().getText().equals(Commands.SETSERIES.getCommand())){
                 film = false;
                 tvSeries = true;
                 sendMessage(update.getMessage().getChatId().toString(),"Send Your Tv Series Season : /season number");
@@ -140,19 +131,19 @@ public class UploadBot extends TelegramLongPollingBot {
 
             //set tv series season
             if(tvSeries){
-                if(update.getMessage().getText().startsWith("/season")){
+                if(update.getMessage().getText().startsWith(Commands.SEARCH.getCommand())){
                     season = update.getMessage().getText().substring(7).trim();
                     bseason = true;
                     sendMessage(update.getMessage().getChatId().toString(),"Send Your Tv Series Upload for a New or Old tv Series New : /new ,Old : /old");
                 }
             }
             if(tvSeries && bseason){
-                if(update.getMessage().getText().equals("/old")){
+                if(update.getMessage().getText().equals(Commands.OLD.getCommand())){
                     oldSeries = true;
                     newSeries = false;
                     sendMessage(update.getMessage().getChatId().toString(),"All Tv Series: /oldall \n" +
                             "Search Tv Series : /search series name");
-                }else if (update.getMessage().getText().equals("/new")){
+                }else if (update.getMessage().getText().equals(Commands.NEW.getCommand())){
                     oldSeries = false;
                     newSeries = true;
                     sendMessage(update.getMessage().getChatId().toString(), "Send Your Tv Series Name with /setname");
@@ -160,14 +151,14 @@ public class UploadBot extends TelegramLongPollingBot {
             }
 
             if(oldSeries){
-                if(update.getMessage().getText().equals("/oldall")){
+                if(update.getMessage().getText().equals(Commands.OLDALL.getCommand())){
 
                 } else if (update.getMessage().getText().startsWith("/search")) {
                     String tvSeriesName = update.getMessage().getText().substring(7).trim();
                     sendMessage(update.getMessage().getChatId().toString(), "Finding Your Group");
                 }
             }else if(newSeries){
-                if(update.getMessage().getText().startsWith("/setname")){
+                if(update.getMessage().getText().startsWith(Commands.SETNAME.getCommand())){
                     String name = update.getMessage().getText().substring(9).trim();
 
                     try {
@@ -190,25 +181,16 @@ public class UploadBot extends TelegramLongPollingBot {
                     }
                 }
             }
-            if(dataRecieve && update.getMessage().getText().equals("/create")){
+            if(dataRecieve && update.getMessage().getText().equals(Commands.CREATE.getCommand())){
                 System.out.println("Start");
                 System.out.println(details);
                 FlaskController flaskController = new FlaskController();
                 ObjectMapper objectMapper = new ObjectMapper();
 
-                ChannelData channelData = new ChannelData();
-                channelData.setChannel_name(title);
-                channelData.setAbout(plot);
-                channelData.setPhone_number("+94761964531");
-                channelData.setUsers(getAdminUsers(user));
-                channelData.setPhoto(poster);
 
-                System.out.println(channelData);
-
-                String data = flaskController.createChannel(channelData);
                 JsonNode jsonNode = null;
                 try {
-                    jsonNode = objectMapper.readTree(data);
+                    jsonNode = objectMapper.readTree("");
                 } catch (JsonProcessingException e) {
                     throw new RuntimeException(e);
                 }
@@ -219,14 +201,12 @@ public class UploadBot extends TelegramLongPollingBot {
                 channelId = channelDataNode.get("channel_id").asText();
                 channelLink = channelDataNode.get("channel_link").asText();
                 if(status.equals("success")){
-                    TvSeriesModel tvSeriesModel = new TvSeriesModel();
-                    tvSeriesModel.createTvSeries(channelId,title, channelLink,year); //here have database updates
+
                     ArrayList <String> genreArrayList = new ArrayList<>();
                     String [] genreArray = genres.split(", ");
                     for(String genre: genreArray){
                         genreArrayList.add(genre);
                     }
-                    tvSeriesModel.createTvHasGenres(channelId,genreArrayList); //their have may database updates
                     sendMessage(update.getMessage().getChatId().toString(),"Database Created Now Upload Your Torrent Files One By One.");
                     newSeriesGroupCreate = true;
                     setGroup = true;
@@ -273,6 +253,17 @@ public class UploadBot extends TelegramLongPollingBot {
         }
     }
 
+    public void sendSticker(String channelID, String document){
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(channelID);
+        sendSticker.setSticker(new InputFile(document));
+        try{
+            execute(sendSticker);
+        }catch (TelegramApiException e){
+            logger.error("Error throw while sticker exeution",e);
+        }
+    }
+
     private void sendOldTvSeriesInlineKeyBoard(String chatId){
 
     }
@@ -281,14 +272,38 @@ public class UploadBot extends TelegramLongPollingBot {
 
     }
 
-    private @NotNull List<String> getAdminUsers(@NotNull HashMap <String, User> userCache){
-        List<String> adminUserIds = new ArrayList<>();
-        for (Map.Entry<String, User> entry : userCache.entrySet()) {
-            User user = entry.getValue();
-            if (user.getUserType() == 1) {
-                adminUserIds.add(entry.getKey());  // Add user ID (key) to the list
-            }
+
+    public void sendSeasonSticker(String chatId, String season){
+        int seasonNum = Integer.valueOf(season);
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(chatId);
+        sendSticker.setSticker(new InputFile("stickers.getSeasonSticker(seasonNum)"));
+        try{
+            execute(sendSticker);
+        }catch (TelegramApiException e){
+            logger.error("Throw A exception while sending season stickers");
         }
-        return adminUserIds;
+    }
+
+    public void sendOtherStickers(String chatId, String sticker){
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(chatId);
+        sendSticker.setSticker(new InputFile("stickers.getOtherSticker(sticker)"));
+        try{
+            execute(sendSticker);
+        }catch (TelegramApiException e){
+            logger.error("Throw A exception while sending other stickers");
+        }
+    }
+
+    public void sendQualitySticker(String chatId, String quality){
+        SendSticker sendSticker = new SendSticker();
+        sendSticker.setChatId(chatId);
+        sendSticker.setSticker(new InputFile("stickers.getQualitySticker(quality)"));
+        try{
+            execute(sendSticker);
+        }catch (TelegramApiException e){
+            logger.error("Throw A exception while sending quality stickers");
+        }
     }
 }
